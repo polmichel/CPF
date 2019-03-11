@@ -1,0 +1,230 @@
+\hypertarget{classBlackScholesModel}{\section{Black\-Scholes\-Model Class Reference}
+\label{classBlackScholesModel}\index{Black\-Scholes\-Model@{Black\-Scholes\-Model}}
+}
+
+
+Modèle de Black Scholes.  
+
+
+
+
+{\ttfamily \#include $<$Black\-Scholes\-Model.\-hpp$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classBlackScholesModel_a803b1ad2cd281d16f0ac66145dbdc9f3}{Black\-Scholes\-Model} (int size, double r, double rho, Pnl\-Vect $\ast$sigma, Pnl\-Vect $\ast$spot, Pnl\-Vect $\ast$trend)
+\item 
+void \hyperlink{classBlackScholesModel_a71ed54a0ca9a89b87610ff699814e120}{asset} (Pnl\-Mat $\ast$path, double T, int nb\-Time\-Steps, Pnl\-Rng $\ast$rng)
+\item 
+void \hyperlink{classBlackScholesModel_a9b2fb8790c28edca5d47c712133af14f}{asset} (Pnl\-Mat $\ast$path, double t, double T, int nb\-Time\-Steps, Pnl\-Rng $\ast$rng, const Pnl\-Mat $\ast$past, double nb\-Steps, int a)
+\item 
+void \hyperlink{classBlackScholesModel_ac89a165e6d27cc12dd77627597f7f56d}{shift\-Asset} (Pnl\-Mat $\ast$shift\-\_\-path, const Pnl\-Mat $\ast$path, int d, double h, double t, double timestep)
+\item 
+void \hyperlink{classBlackScholesModel_affbc621fa8678a7aa9aa4699f27f5258}{simul\-\_\-market} (Pnl\-Mat $\ast$simulated\-Market, double T, Pnl\-Rng $\ast$rng)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{classBlackScholesModel_ab84e9318c0c1e8a50d5e2f9a70f1256e}{size\-\_\-}
+\item 
+double \hyperlink{classBlackScholesModel_a9b07eb1d8a7ada20e1a723ba19172644}{r\-\_\-}
+\item 
+double \hyperlink{classBlackScholesModel_a1022a65929e3656f8990b7b0a63705ba}{rho\-\_\-}
+\item 
+Pnl\-Vect $\ast$ \hyperlink{classBlackScholesModel_a745a2d85da5056b44bd88f37ee7b33e0}{sigma\-\_\-}
+\item 
+Pnl\-Vect $\ast$ \hyperlink{classBlackScholesModel_a6ce6853d5f0d65c8e0f07cdedca3e26a}{spot\-\_\-}
+\item 
+Pnl\-Vect $\ast$ \hyperlink{classBlackScholesModel_af92b535c61f17e7a16af56952739302f}{trend\-\_\-}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Modèle de Black Scholes. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classBlackScholesModel_a803b1ad2cd281d16f0ac66145dbdc9f3}{\index{Black\-Scholes\-Model@{Black\-Scholes\-Model}!Black\-Scholes\-Model@{Black\-Scholes\-Model}}
+\index{Black\-Scholes\-Model@{Black\-Scholes\-Model}!BlackScholesModel@{Black\-Scholes\-Model}}
+\subsubsection[{Black\-Scholes\-Model}]{\setlength{\rightskip}{0pt plus 5cm}Black\-Scholes\-Model\-::\-Black\-Scholes\-Model (
+\begin{DoxyParamCaption}
+\item[{int}]{size, }
+\item[{double}]{r, }
+\item[{double}]{rho, }
+\item[{Pnl\-Vect $\ast$}]{sigma, }
+\item[{Pnl\-Vect $\ast$}]{spot, }
+\item[{Pnl\-Vect $\ast$}]{trend}
+\end{DoxyParamCaption}
+)}}\label{classBlackScholesModel_a803b1ad2cd281d16f0ac66145dbdc9f3}
+Constructeur de la classe 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em size} & \-: nombre d'actifs du modèle \\
+\hline
+\mbox{\tt in}  & {\em r} & \-: taux d'intérêt \\
+\hline
+\mbox{\tt in}  & {\em rho} & \-: paramètre de corrélation \\
+\hline
+\mbox{\tt in}  & {\em sigma} & \-: vecteur de volatilités \\
+\hline
+\mbox{\tt in}  & {\em spot} & \-: valeurs initiales des sous-\/jacents \\
+\hline
+\mbox{\tt in}  & {\em trend} & \-: tendance du modèle \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classBlackScholesModel_a71ed54a0ca9a89b87610ff699814e120}{\index{Black\-Scholes\-Model@{Black\-Scholes\-Model}!asset@{asset}}
+\index{asset@{asset}!BlackScholesModel@{Black\-Scholes\-Model}}
+\subsubsection[{asset}]{\setlength{\rightskip}{0pt plus 5cm}void Black\-Scholes\-Model\-::asset (
+\begin{DoxyParamCaption}
+\item[{Pnl\-Mat $\ast$}]{path, }
+\item[{double}]{T, }
+\item[{int}]{nb\-Time\-Steps, }
+\item[{Pnl\-Rng $\ast$}]{rng}
+\end{DoxyParamCaption}
+)}}\label{classBlackScholesModel_a71ed54a0ca9a89b87610ff699814e120}
+Génère une trajectoire du modèle et la stocke dans path
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em path} & contient une trajectoire du modèle. C'est une matrice de taille (nb\-Time\-Steps+1) x d \\
+\hline
+\mbox{\tt in}  & {\em T} & maturité \\
+\hline
+\mbox{\tt in}  & {\em rng} & generateur de nombres aleatoires \\
+\hline
+\mbox{\tt in}  & {\em nb\-Time\-Steps} & nombre de dates de constatation\\
+\hline
+\end{DoxyParams}
+Génère une trajectoire du modèle et la stocke dans path
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em path} & contient une trajectoire du modèle. C'est une matrice de taille (nb\-Time\-Steps+1) x d \\
+\hline
+\mbox{\tt in}  & {\em T} & maturité \\
+\hline
+\mbox{\tt in}  & {\em nb\-Time\-Steps} & nombre de dates de constatation \\
+\hline
+\end{DoxyParams}
+\hypertarget{classBlackScholesModel_a9b2fb8790c28edca5d47c712133af14f}{\index{Black\-Scholes\-Model@{Black\-Scholes\-Model}!asset@{asset}}
+\index{asset@{asset}!BlackScholesModel@{Black\-Scholes\-Model}}
+\subsubsection[{asset}]{\setlength{\rightskip}{0pt plus 5cm}void Black\-Scholes\-Model\-::asset (
+\begin{DoxyParamCaption}
+\item[{Pnl\-Mat $\ast$}]{path, }
+\item[{double}]{t, }
+\item[{double}]{T, }
+\item[{int}]{nb\-Time\-Steps, }
+\item[{Pnl\-Rng $\ast$}]{rng, }
+\item[{const Pnl\-Mat $\ast$}]{past, }
+\item[{double}]{nb\-Steps, }
+\item[{int}]{a}
+\end{DoxyParamCaption}
+)}}\label{classBlackScholesModel_a9b2fb8790c28edca5d47c712133af14f}
+Calcule une trajectoire du sous-\/jacent connaissant le passé jusqu' à la date t
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em path} & contient une trajectoire du sous-\/jacent donnée jusqu'à l'instant t par la matrice past \\
+\hline
+\mbox{\tt in}  & {\em t} & date jusqu'à laquelle on connait la trajectoire. t n'est pas forcément une date de discrétisation \\
+\hline
+\mbox{\tt in}  & {\em nb\-Time\-Steps} & nombre de pas de constatation \\
+\hline
+\mbox{\tt in}  & {\em T} & date jusqu'à laquelle on simule la trajectoire \\
+\hline
+\mbox{\tt in}  & {\em rng} & generateur de nombres aleatoires \\
+\hline
+\mbox{\tt in}  & {\em past} & trajectoire réalisée jusqu'a la date t\\
+\hline
+\end{DoxyParams}
+Calcule une trajectoire du sous-\/jacent connaissant le passé jusqu' à la date t
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em path} & contient une trajectoire du sous-\/jacent donnée jusqu'à l'instant t par la matrice past \\
+\hline
+\mbox{\tt in}  & {\em t} & date jusqu'à laquelle on connait la trajectoire. t n'est pas forcément une date de discrétisation \\
+\hline
+\mbox{\tt in}  & {\em nb\-Time\-Steps} & nombre de pas de constatation \\
+\hline
+\mbox{\tt in}  & {\em T} & date jusqu'à laquelle on simule la trajectoire \\
+\hline
+\mbox{\tt in}  & {\em past} & trajectoire réalisée jusqu'a la date t \\
+\hline
+\end{DoxyParams}
+\hypertarget{classBlackScholesModel_ac89a165e6d27cc12dd77627597f7f56d}{\index{Black\-Scholes\-Model@{Black\-Scholes\-Model}!shift\-Asset@{shift\-Asset}}
+\index{shift\-Asset@{shift\-Asset}!BlackScholesModel@{Black\-Scholes\-Model}}
+\subsubsection[{shift\-Asset}]{\setlength{\rightskip}{0pt plus 5cm}void Black\-Scholes\-Model\-::shift\-Asset (
+\begin{DoxyParamCaption}
+\item[{Pnl\-Mat $\ast$}]{shift\-\_\-path, }
+\item[{const Pnl\-Mat $\ast$}]{path, }
+\item[{int}]{d, }
+\item[{double}]{h, }
+\item[{double}]{t, }
+\item[{double}]{timestep}
+\end{DoxyParamCaption}
+)}}\label{classBlackScholesModel_ac89a165e6d27cc12dd77627597f7f56d}
+Shift d'une trajectoire du sous-\/jacent
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em path} & contient en input la trajectoire du sous-\/jacent \\
+\hline
+\mbox{\tt out}  & {\em shift\-\_\-path} & contient la trajectoire path dont la composante d a été shiftée par (1+h) à partir de la date t. \\
+\hline
+\mbox{\tt in}  & {\em t} & date à partir de laquelle on shift \\
+\hline
+\mbox{\tt in}  & {\em h} & pas de différences finies \\
+\hline
+\mbox{\tt in}  & {\em d} & indice du sous-\/jacent à shifter \\
+\hline
+\mbox{\tt in}  & {\em timestep} & pas de constatation du sous-\/jacent \\
+\hline
+\end{DoxyParams}
+\hypertarget{classBlackScholesModel_affbc621fa8678a7aa9aa4699f27f5258}{\index{Black\-Scholes\-Model@{Black\-Scholes\-Model}!simul\-\_\-market@{simul\-\_\-market}}
+\index{simul\-\_\-market@{simul\-\_\-market}!BlackScholesModel@{Black\-Scholes\-Model}}
+\subsubsection[{simul\-\_\-market}]{\setlength{\rightskip}{0pt plus 5cm}void Black\-Scholes\-Model\-::simul\-\_\-market (
+\begin{DoxyParamCaption}
+\item[{Pnl\-Mat $\ast$}]{simulated\-Market, }
+\item[{double}]{T, }
+\item[{Pnl\-Rng $\ast$}]{rng}
+\end{DoxyParamCaption}
+)}}\label{classBlackScholesModel_affbc621fa8678a7aa9aa4699f27f5258}
+Simulation du marché (simulation du modèle sous la probabilité historique) 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em simulated\-Market} & \-: contient les valeurs simulées du marché \\
+\hline
+\mbox{\tt in}  & {\em T} & \-: maturité \\
+\hline
+\mbox{\tt in}  & {\em rng} & \-: générateur de nombres aléatoires \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classBlackScholesModel_a9b07eb1d8a7ada20e1a723ba19172644}{\index{Black\-Scholes\-Model@{Black\-Scholes\-Model}!r\-\_\-@{r\-\_\-}}
+\index{r\-\_\-@{r\-\_\-}!BlackScholesModel@{Black\-Scholes\-Model}}
+\subsubsection[{r\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}double Black\-Scholes\-Model\-::r\-\_\-}}\label{classBlackScholesModel_a9b07eb1d8a7ada20e1a723ba19172644}
+taux d'intérêt \hypertarget{classBlackScholesModel_a1022a65929e3656f8990b7b0a63705ba}{\index{Black\-Scholes\-Model@{Black\-Scholes\-Model}!rho\-\_\-@{rho\-\_\-}}
+\index{rho\-\_\-@{rho\-\_\-}!BlackScholesModel@{Black\-Scholes\-Model}}
+\subsubsection[{rho\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}double Black\-Scholes\-Model\-::rho\-\_\-}}\label{classBlackScholesModel_a1022a65929e3656f8990b7b0a63705ba}
+paramètre de corrélation \hypertarget{classBlackScholesModel_a745a2d85da5056b44bd88f37ee7b33e0}{\index{Black\-Scholes\-Model@{Black\-Scholes\-Model}!sigma\-\_\-@{sigma\-\_\-}}
+\index{sigma\-\_\-@{sigma\-\_\-}!BlackScholesModel@{Black\-Scholes\-Model}}
+\subsubsection[{sigma\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}Pnl\-Vect$\ast$ Black\-Scholes\-Model\-::sigma\-\_\-}}\label{classBlackScholesModel_a745a2d85da5056b44bd88f37ee7b33e0}
+vecteur de volatilités \hypertarget{classBlackScholesModel_ab84e9318c0c1e8a50d5e2f9a70f1256e}{\index{Black\-Scholes\-Model@{Black\-Scholes\-Model}!size\-\_\-@{size\-\_\-}}
+\index{size\-\_\-@{size\-\_\-}!BlackScholesModel@{Black\-Scholes\-Model}}
+\subsubsection[{size\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}int Black\-Scholes\-Model\-::size\-\_\-}}\label{classBlackScholesModel_ab84e9318c0c1e8a50d5e2f9a70f1256e}
+nombre d'actifs du modèle \hypertarget{classBlackScholesModel_a6ce6853d5f0d65c8e0f07cdedca3e26a}{\index{Black\-Scholes\-Model@{Black\-Scholes\-Model}!spot\-\_\-@{spot\-\_\-}}
+\index{spot\-\_\-@{spot\-\_\-}!BlackScholesModel@{Black\-Scholes\-Model}}
+\subsubsection[{spot\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}Pnl\-Vect$\ast$ Black\-Scholes\-Model\-::spot\-\_\-}}\label{classBlackScholesModel_a6ce6853d5f0d65c8e0f07cdedca3e26a}
+valeurs initiales des sous-\/jacents \hypertarget{classBlackScholesModel_af92b535c61f17e7a16af56952739302f}{\index{Black\-Scholes\-Model@{Black\-Scholes\-Model}!trend\-\_\-@{trend\-\_\-}}
+\index{trend\-\_\-@{trend\-\_\-}!BlackScholesModel@{Black\-Scholes\-Model}}
+\subsubsection[{trend\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}Pnl\-Vect$\ast$ Black\-Scholes\-Model\-::trend\-\_\-}}\label{classBlackScholesModel_af92b535c61f17e7a16af56952739302f}
+vecteur des tendances 
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/user/5/.\-base/mazarsa/home/3a/calcul\-\_\-parallèle/projet/pricer/chamilo/pricer-\/skel/src/Black\-Scholes\-Model.\-hpp\item 
+/user/5/.\-base/mazarsa/home/3a/calcul\-\_\-parallèle/projet/pricer/chamilo/pricer-\/skel/src/Black\-Scholes\-Model.\-cpp\end{DoxyCompactItemize}
