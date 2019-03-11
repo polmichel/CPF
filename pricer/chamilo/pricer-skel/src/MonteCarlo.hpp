@@ -38,6 +38,10 @@ public:
      */
     void price(double &prix, double &ic);
 
+    void price_master(double &prix, double &esp_carre, double &ic);
+    void price_slave(double &prix, double &ic);
+
+
     /**
      * Calcule le prix de l'option à la date t
      *

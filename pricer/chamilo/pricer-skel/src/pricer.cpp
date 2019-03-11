@@ -16,6 +16,12 @@ int main(int argc, char **argv)
 {
     MPI_Init(&argc, &argv);
 
+    int size, rank;
+    MPI_Comm_size (MPI_COMM_WORLD, &size);
+    MPI_Comm_rank (MPI_COMM_WORLD, &rank);
+
+    double start = MPI_Wtime();
+
     clock_t t1, t2, t3, t4;
     t1=clock();
     double fdStep = 0.1;
