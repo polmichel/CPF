@@ -1,2 +1,5 @@
-pricer/chamilo/pricer-skel/doc
-pricer/chamilo/pricer-skel/build
+pricer/chamilo/pricer-skel/doc/
+pricer/chamilo/pricer-skel/doc/doc_doxygen/
+pricer/chamilo/pricer-skel/doc/doc_doxygen/html
+pricer/chamilo/pricer-skel/doc/doc_doxygen/latex
+pricer/chamilo/pricer-skel/build/
