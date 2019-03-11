@@ -14,6 +14,8 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
+    MPI_Init(&argc, &argv);
+
     clock_t t1, t2, t3, t4;
     t1=clock();
     double fdStep = 0.1;
@@ -129,4 +131,7 @@ int main(int argc, char **argv)
     delete bsmodel;
     delete opt;
     delete mCarlo;
+
+    MPI_Finalize ();
+
 }

@@ -27,21 +27,30 @@ MonteCarlo::MonteCarlo(BlackScholesModel *mod, Option *opt, PnlRng *rng, double 
     * @param[out] ic largeur de l'intervalle de confiance
 */
 void MonteCarlo::price(double &prix, double &ic){
+    int size, rank;
+    MPI_Comm_size (MPI_COMM_WORLD, &size);
+    MPI_Comm_rank (MPI_COMM_WORLD, &rank);
     double payoff;
     prix = 0;
     PnlMat *path;
     double esp_carre = 0; //premier membre pour calculer la variance
     path = pnl_mat_create(opt_->nbTimeSteps_ + 1, mod_->size_);
     for (size_t j = 0; j < nbSamples_; ++j) {
-        mod_->asset(path, opt_->T_, opt_->nbTimeSteps_, rng_);
-        payoff = opt_->payoff(path);
-        prix += payoff;
-        esp_carre += pow(payoff,2);
+        if (rank == 0) {
+            //recevoir la réponse de j
+            MPI_Recv(payoff, 1, MPI_LONG, 1, j, MPI_COMM_WORLD, NULL);
+            prix += payoff;
+            esp_carre += pow(payoff,2);
+        } else {
+            //envoyer la réponse j au maître
+            mod_->asset(path, opt_->T_, opt_->nbTimeSteps_, rng_);
+            payoff = opt_->payoff(path);
+            MPI_Send(&payoff, 1, MPI_LONG, 0, j, MPI_COMM_WORLD);
+        }
     }
     double estimateur_carre = exp(-2*mod_->r_*opt_->T_)*(esp_carre/nbSamples_-pow(prix/nbSamples_,2));
     prix *= exp(-mod_->r_*opt_->T_)/nbSamples_;
     ic = 1.96 * sqrt(estimateur_carre/nbSamples_);
-
     pnl_mat_free(&path);
 }
 
