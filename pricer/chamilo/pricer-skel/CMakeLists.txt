@@ -20,6 +20,18 @@ if (NOT CMAKE_BUILD_TYPE)
 endif ()
 
 
+# Detect MPI
+add_definitions(-DOMPI_SKIP_MPICXX)
+set(MPI_LIBS)
+find_package(MPI REQUIRED)
+if (MPI_C_FOUND)
+    include_directories(${MPI_C_INCLUDE_PATH})
+    add_definitions(-DOMPI_SKIP_MPICXX)
+    set (MPI_LIBS ${MPI_LIBS} ${MPI_C_LIBRARIES})
+else (MPI_C_FOUND)
+    message(STATUS "MPI not found.")
+endif (MPI_C_FOUND)
+
 # Detect Boost
 set(Boost_NO_BOOST_CMAKE ON)
 find_package(Boost REQUIRED)
@@ -45,18 +57,18 @@ add_subdirectory(src/3rdparty/jlparser)
 
 # Test the parser
 add_executable(test-parser src/test_parser.cpp)
-target_link_libraries(test-parser jl_parser ${LIBS})
+target_link_libraries(test-parser jl_parser ${LIBS} ${MPI_LIBS})
 
 add_executable(mc-example src/mc_example.cpp src/MonteCarlo.cpp src/MonteCarlo.hpp src/BlackScholesModel.cpp src/BlackScholesModel.hpp src/Option.cpp src/Option.hpp
         src/BasketOption.cpp src/BasketOption.hpp src/AsianOption.cpp src/AsianOption.hpp src/PerformanceOption.cpp src/PerformanceOption.hpp
         src/CallOption.cpp src/CallOption.hpp )
-target_link_libraries(mc-example jl_parser ${LIBS})
+target_link_libraries(mc-example jl_parser ${LIBS} ${MPI_LIBS})
 
 #Pricer
 add_executable(pricer src/pricer.cpp src/MonteCarlo.cpp src/MonteCarlo.hpp src/BlackScholesModel.cpp src/BlackScholesModel.hpp src/Option.cpp src/Option.hpp
         src/BasketOption.cpp src/BasketOption.hpp src/AsianOption.cpp src/AsianOption.hpp src/PerformanceOption.cpp src/PerformanceOption.hpp
         src/CallOption.cpp src/CallOption.hpp)
-target_link_libraries(pricer jl_parser ${LIBS})
+target_link_libraries(pricer jl_parser ${LIBS} ${MPI_LIBS})
 
 
 # Print compiler flags
