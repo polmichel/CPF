@@ -1,0 +1,1 @@
+/usr/bin/cc  -fopenmp -g    CMakeFiles/deadlock.dir/deadlock.c.o  -o deadlock -rdynamic -lm /usr/lib64/openmpi/lib/libmpi.so -Wl,-rpath,/usr/lib64/openmpi/lib 
