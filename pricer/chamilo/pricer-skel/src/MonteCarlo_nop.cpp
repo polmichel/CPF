@@ -2,7 +2,10 @@
 // Created by lecalvmy on 9/13/18.
 //
 
-#include "MonteCarlo.hpp"
+#include "MonteCarlo_nop.hpp"
+#include "mpi.h"
+#include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -14,7 +17,7 @@ using namespace std;
 * param[in] fdStep : pas de différence finie
 * param[in] nbSamples : nombre de tirages Monte Carlo
 */
-MonteCarlo::MonteCarlo(BlackScholesModel *mod, Option *opt, PnlRng *rng, double fdStep, int nbSamples){
+MonteCarlo_nop::MonteCarlo_nop(BlackScholesModel *mod, Option *opt, PnlRng *rng, double fdStep, int nbSamples){
     mod_ = mod;
     opt_ = opt;
     rng_ = rng;
@@ -26,15 +29,20 @@ MonteCarlo::MonteCarlo(BlackScholesModel *mod, Option *opt, PnlRng *rng, double 
     * @param[out] prix valeur de l'estimateur Monte Carlo
     * @param[out] ic largeur de l'intervalle de confiance
 */
-void MonteCarlo::price(double &prix, double &ic){
+void MonteCarlo_nop::price(double &prix, double &ic){
     double payoff;
     prix = 0;
+    int sized, rank;
+    MPI_Comm_size (MPI_COMM_WORLD, &sized);
+    MPI_Comm_rank (MPI_COMM_WORLD, &rank);
     PnlMat *path;
     double esp_carre = 0; //premier membre pour calculer la variance
     path = pnl_mat_create(opt_->nbTimeSteps_ + 1, mod_->size_);
     for (size_t j = 0; j < nbSamples_; ++j) {
         mod_->asset(path, opt_->T_, opt_->nbTimeSteps_, rng_);
         payoff = opt_->payoff(path);
+        cout<< "VERIFINS LES PRIIIIIX   " << payoff<< "     "<<endl;
+
         prix += payoff;
         esp_carre += pow(payoff,2);
     }
@@ -55,7 +63,7 @@ void MonteCarlo::price(double &prix, double &ic){
  * @param[out] ic contient la largeur de l'intervalle
  * de confiance sur le calcul du prix
  */
-void MonteCarlo::price(const PnlMat *past, double t, double &prix, double &ic){
+void MonteCarlo_nop::price(const PnlMat *past, double t, double &prix, double &ic){
     double payoff;
     prix = 0;
     PnlMat *path;
@@ -94,7 +102,7 @@ void MonteCarlo::price(const PnlMat *past, double t, double &prix, double &ic){
  * @param[out] delta contient le vecteur de delta
  * @param[in] conf_delta contient le vecteur d'intervalle de confiance sur le calcul du delta
  */
-void MonteCarlo::delta(const PnlMat *past, double t, PnlVect *delta, PnlVect *conf_delta){
+void MonteCarlo_nop::delta(const PnlMat *past, double t, PnlVect *delta, PnlVect *conf_delta){
 
     double sum;
     double sum2;
@@ -153,7 +161,7 @@ void MonteCarlo::delta(const PnlMat *past, double t, PnlVect *delta, PnlVect *co
  * @param[in] marketPrice contient la disposition des trajectoires de marché
  * @param[in] H : nombre de rebalancements
  */
-void MonteCarlo::PriceDelta(PnlVect *listPrice, PnlMat *matDelta, PnlMat *marketPrice, int H){
+void MonteCarlo_nop::PriceDelta(PnlVect *listPrice, PnlMat *matDelta, PnlMat *marketPrice, int H){
         double delta_h = (opt_->T_)/H;
         double delta_t = (opt_->T_)/opt_->nbTimeSteps_;
         int k = H/opt_->nbTimeSteps_;
@@ -190,7 +198,7 @@ void MonteCarlo::PriceDelta(PnlVect *listPrice, PnlMat *matDelta, PnlMat *market
  * @param[out] listHedge contient la valeur du portefeuille de couverture à differents instants
  * @param[in] marketPrice contient la disposition des trajectoires de marché
  */
-void MonteCarlo::listHedge(PnlVect *listHedge,PnlVect *lastDelta, double& lastPrice, PnlMat *marketPrice){
+void MonteCarlo_nop::listHedge(PnlVect *listHedge,PnlVect *lastDelta, double& lastPrice, PnlMat *marketPrice){
         double H = marketPrice->m - 1;
         int size = marketPrice->n;
         PnlVect *price = pnl_vect_create(H+1);
@@ -232,7 +240,7 @@ void MonteCarlo::listHedge(PnlVect *listHedge,PnlVect *lastDelta, double& lastPr
 * @param[in] marketPrice : disposition des trajectoires de marché
 * @param[in] H : nombre de rebalancements
 */
-void MonteCarlo::pnl(double& pnl, PnlMat *marketPrice, int H){
+void MonteCarlo_nop::pnl(double& pnl, PnlMat *marketPrice, int H){
       double lastPrice = 0;
       PnlVect* lastDelta = pnl_vect_create(opt_->size_);
       PnlVect* hedges = pnl_vect_create(H+1);

@@ -62,17 +62,22 @@ add_subdirectory(src/3rdparty/jlparser)
 add_executable(test-parser src/test_parser.cpp)
 target_link_libraries(test-parser jl_parser ${LIBS} ${MPI_LIBS})
 
-add_executable(mc-example src/mc_example.cpp src/MonteCarlo.cpp src/MonteCarlo.hpp src/BlackScholesModel.cpp src/BlackScholesModel.hpp src/Option.cpp src/Option.hpp
+add_executable(mc-example src/mc_example.cpp src/MonteCarlo.cpp src/MonteCarlo.hpp src/MonteCarlo_nop.cpp src/MonteCarlo_nop.hpp src/BlackScholesModel.cpp src/BlackScholesModel.hpp src/Option.cpp src/Option.hpp
         src/BasketOption.cpp src/BasketOption.hpp src/AsianOption.cpp src/AsianOption.hpp src/PerformanceOption.cpp src/PerformanceOption.hpp
         src/CallOption.cpp src/CallOption.hpp )
 target_link_libraries(mc-example jl_parser ${LIBS} ${MPI_LIBS})
 
 #Pricer
-add_executable(pricer src/pricer.cpp src/MonteCarlo.cpp src/MonteCarlo.hpp src/BlackScholesModel.cpp src/BlackScholesModel.hpp src/Option.cpp src/Option.hpp
+add_executable(pricer src/pricer.cpp src/MonteCarlo.cpp src/MonteCarlo.hpp src/BlackScholesModel.cpp src/BlackScholesModel.hpp src/MonteCarlo_nop.cpp src/MonteCarlo_nop.hpp src/Option.cpp src/Option.hpp
         src/BasketOption.cpp src/BasketOption.hpp src/AsianOption.cpp src/AsianOption.hpp src/PerformanceOption.cpp src/PerformanceOption.hpp
         src/CallOption.cpp src/CallOption.hpp)
 target_link_libraries(pricer jl_parser ${LIBS} ${MPI_LIBS})
 
+#Pricer
+add_executable(pricer_nop src/pricer_nop.cpp src/MonteCarlo.cpp src/MonteCarlo_nop.cpp src/MonteCarlo_nop.hpp src/MonteCarlo.hpp src/BlackScholesModel.cpp src/BlackScholesModel.hpp src/Option.cpp src/Option.hpp
+        src/BasketOption.cpp src/BasketOption.hpp src/AsianOption.cpp src/AsianOption.hpp src/PerformanceOption.cpp src/PerformanceOption.hpp
+        src/CallOption.cpp src/CallOption.hpp)
+target_link_libraries(pricer_nop jl_parser ${LIBS} ${MPI_LIBS})
 
 # Print compiler flags
 get_directory_property(DirDefs COMPILE_DEFINITIONS)

@@ -2,18 +2,21 @@
 #include <string>
 #include "jlparser/parser.hpp"
 #include "BlackScholesModel.hpp"
-#include "MonteCarlo.hpp"
+#include "MonteCarlo_nop.hpp"
 #include "AsianOption.hpp"
 #include "BasketOption.hpp"
 #include "CallOption.hpp"
 #include "PerformanceOption.hpp"
 #include <time.h>
+#include "mpi.h"
 
 
 using namespace std;
 
 int main(int argc, char **argv)
 {
+    MPI_Init(&argc, &argv);
+
     clock_t t1, t2, t3, t4;
     t1=clock();
     double fdStep = 0.1;
@@ -81,10 +84,14 @@ int main(int argc, char **argv)
     pnl_rng_sseed(rng, time(NULL));
 
 
-    MonteCarlo *mCarlo = new MonteCarlo(bsmodel, opt, rng, fdStep, n_samples);
+    MonteCarlo_nop *mCarlo = new MonteCarlo_nop(bsmodel, opt, rng, fdStep, n_samples);
     double prix = 0.0;
     double ic = 0.0;
+    double start = MPI_Wtime();
     mCarlo->price(prix , ic);
+
+    double end = MPI_Wtime();
+    double WPITime = end - start;
     printf("============== \nPrix: %f \nIc: %f \n", prix, ic);
     t2 = clock();
     float diff ((float)t2-(float)t1);
@@ -129,4 +136,9 @@ int main(int argc, char **argv)
     delete bsmodel;
     delete opt;
     delete mCarlo;
+
+    cout<<"le temps écoulé fut de  : " << WPITime << "    " <<endl;
+
+
+    MPI_Finalize ();
 }

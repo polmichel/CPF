@@ -4,6 +4,8 @@
 
 #include "MonteCarlo.hpp"
 #include "mpi.h"
+#include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -27,41 +29,71 @@ MonteCarlo::MonteCarlo(BlackScholesModel *mod, Option *opt, PnlRng *rng, double 
     * @param[out] prix valeur de l'estimateur Monte Carlo
     * @param[out] ic largeur de l'intervalle de confiance
 */
-void MonteCarlo::price(double &prix, double &ic){
+/*void MonteCarlo::price(double &prix, double &ic){
 
-    int sized, rank;
-    MPI_Comm_size (MPI_COMM_WORLD, &sized);
-    MPI_Comm_rank (MPI_COMM_WORLD, &rank);
-    double payoff;
-    prix = 0;
-    double esp_carre = 0; //premier membre pour calculer la variance
-    for (size_t j = 0; j < nbSamples_; ++j) {
-        if (rank == 0) {
-            price_master(prix, esp_carre, payoff);
-        } else {
-            price_slave(prix, payoff);
-        }
+}*/
+
+void MonteCarlo::price_master(double &prix, double &ic, int size){
+
+
+    double sumPayoff, payoff, esp_carre;
+    double priceNumber_i, icNumber_i;
+    PnlMat *path;
+    path = pnl_mat_create(opt_->nbTimeSteps_ + 1, mod_->size_);
+
+    PnlVect* vectPrices = pnl_vect_create(size);
+    PnlVect* vectIcs = pnl_vect_create(size);
+
+    for (int i = 1; i< this->nbSamples_/size; i++) {
+
+        mod_->asset(path, opt_->T_, opt_->nbTimeSteps_, rng_);
+        payoff = opt_->payoff(path);
+        sumPayoff += payoff;
+        esp_carre += payoff*payoff;
+
     }
+
+    for (int i = 1; i< size; i++) {
+
+        // réception réponse i
+        MPI_Recv(&priceNumber_i, 1, MPI_DOUBLE, i,i, MPI_COMM_WORLD, NULL);
+        MPI_Recv(&icNumber_i, 1, MPI_DOUBLE, i,i+size, MPI_COMM_WORLD, NULL);
+
+        // enregistrement réponse i à la bonne zone mémoire grâce aux tags
+
+        LET(vectPrices, i) = priceNumber_i;
+        LET(vectIcs, i) = icNumber_i;
+    }
+
+    //regroupement des différents prix pour faire la moyenne
+    prix = pnl_vect_sum(vectPrices);
+    prix/=nbSamples_;
+    esp_carre = pnl_vect_sum(vectIcs);
+    esp_carre/=nbSamples_;
+
     double estimateur_carre = exp(-2*mod_->r_*opt_->T_)*(esp_carre/nbSamples_-pow(prix/nbSamples_,2));
+
     prix *= exp(-mod_->r_*opt_->T_)/nbSamples_;
     ic = 1.96 * sqrt(estimateur_carre/nbSamples_);
 }
 
-void MonteCarlo::price_master(double &prix, double &esp_carre, double &payoff){
-    //recevoir la réponse de j
-    MPI_Recv(&payoff, 1, MPI_LONG, 1, 0, MPI_COMM_WORLD, NULL); //tag à changer deuxième zéro ?
-    prix += payoff;
-    esp_carre += pow(payoff,2);
-}
-
-void MonteCarlo::price_slave(double &prix, double &ic){
+void MonteCarlo::price_slave(double &prix, double &ic, int size, int rank){
     //envoyer la réponse j au maître
-    double payoff;
+    double sumPayoff, payoff, var;
     PnlMat *path;
     path = pnl_mat_create(opt_->nbTimeSteps_ + 1, mod_->size_);
-    mod_->asset(path, opt_->T_, opt_->nbTimeSteps_, rng_);
-    payoff = opt_->payoff(path);
-    MPI_Send(&payoff, 1, MPI_LONG, 0, 0, MPI_COMM_WORLD); //tag à changer deuxième zéro ?
+    for (int i = 1; i< this->nbSamples_/size; i++) {
+
+        mod_->asset(path, opt_->T_, opt_->nbTimeSteps_, rng_);
+        payoff = opt_->payoff(path);
+        sumPayoff += payoff;
+        var += payoff*payoff;
+
+    }
+    //rank et rank + size servent à distinguer les réponses en fonction d'un tag unique
+    MPI_Send(&sumPayoff, 1, MPI_DOUBLE, 0, rank, MPI_COMM_WORLD);
+    MPI_Send(&var, 1, MPI_DOUBLE, 0, rank+size, MPI_COMM_WORLD);
+    //MPI_Send(&payoff, 1, MPI_LONG, 0, 0, MPI_COMM_WORLD); //tag à changer deuxième zéro ?
     pnl_mat_free(&path);
 }
 

@@ -17,11 +17,11 @@ using namespace std;
 int main(int argc, char **argv)
 {
     MPI_Init(&argc, &argv);
-
-
-
-    double start = MPI_Wtime();
-
+    int sized, rank;
+    MPI_Comm_size (MPI_COMM_WORLD, &sized);
+    MPI_Comm_rank (MPI_COMM_WORLD, &rank);
+    PnlRng *rng = pnl_rng_create(PNL_RNG_MERSENNE);
+    pnl_rng_sseed(rng, time(NULL));
     clock_t t1, t2, t3, t4;
     t1=clock();
     double fdStep = 0.1;
@@ -82,17 +82,22 @@ int main(int argc, char **argv)
     }
 
 
-    PnlRng *rng= pnl_rng_create(PNL_RNG_MERSENNE);
 
-    //
-    pnl_rng_init(rng, PNL_RNG_MERSENNE);
-    pnl_rng_sseed(rng, time(NULL));
 
 
     MonteCarlo *mCarlo = new MonteCarlo(bsmodel, opt, rng, fdStep, n_samples);
     double prix = 0.0;
     double ic = 0.0;
-    mCarlo->price(prix , ic);
+    double start = MPI_Wtime();
+    if(rank == 0) {
+        mCarlo->price_master(prix, ic, sized);
+    } else {
+        mCarlo->price_slave(prix, ic, sized, rank);
+    }
+
+
+    double end = MPI_Wtime();
+    double WPITime = end-start;
     printf("============== \nPrix: %f \nIc: %f \n", prix, ic);
     t2 = clock();
     float diff ((float)t2-(float)t1);
@@ -125,6 +130,9 @@ int main(int argc, char **argv)
         printf("%f sec\n", seconds3);
     }
 
+
+
+    cout<<"le temps écoulé fut de  : " << WPITime << "    " <<endl;
     pnl_mat_free(&past);
     pnl_vect_free(&delta);
     pnl_vect_free(&conf_delta);

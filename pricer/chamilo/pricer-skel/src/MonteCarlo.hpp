@@ -36,10 +36,10 @@ public:
      * @param[out] prix valeur de l'estimateur Monte Carlo
      * @param[out] ic largeur de l'intervalle de confiance
      */
-    void price(double &prix, double &ic);
+    //void price(double &prix, double &ic);
 
-    void price_master(double &prix, double &esp_carre, double &ic);
-    void price_slave(double &prix, double &ic);
+    void price_master(double &prix, double &ic, int size);
+    void price_slave(double &prix, double &ic, int size, int rank);
 
 
     /**
