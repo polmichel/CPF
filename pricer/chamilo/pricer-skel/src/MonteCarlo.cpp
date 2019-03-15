@@ -3,6 +3,7 @@
 //
 
 #include "MonteCarlo.hpp"
+#include "mpi.h"
 
 using namespace std;
 
@@ -27,27 +28,28 @@ MonteCarlo::MonteCarlo(BlackScholesModel *mod, Option *opt, PnlRng *rng, double 
     * @param[out] ic largeur de l'intervalle de confiance
 */
 void MonteCarlo::price(double &prix, double &ic){
+
+    int sized, rank;
+    MPI_Comm_size (MPI_COMM_WORLD, &sized);
+    MPI_Comm_rank (MPI_COMM_WORLD, &rank);
     double payoff;
     prix = 0;
-    PnlMat *path;
     double esp_carre = 0; //premier membre pour calculer la variance
-    path = pnl_mat_create(opt_->nbTimeSteps_ + 1, mod_->size_);
     for (size_t j = 0; j < nbSamples_; ++j) {
         if (rank == 0) {
-            price_master(&prix, &esp_carre, &payoff);
+            price_master(prix, esp_carre, payoff);
         } else {
-            price_slave(&prix, &payoff);
+            price_slave(prix, payoff);
         }
     }
     double estimateur_carre = exp(-2*mod_->r_*opt_->T_)*(esp_carre/nbSamples_-pow(prix/nbSamples_,2));
     prix *= exp(-mod_->r_*opt_->T_)/nbSamples_;
     ic = 1.96 * sqrt(estimateur_carre/nbSamples_);
-    pnl_mat_free(&path);
 }
 
 void MonteCarlo::price_master(double &prix, double &esp_carre, double &payoff){
     //recevoir la réponse de j
-    MPI_Recv(payoff, 1, MPI_LONG, 1, 0, MPI_COMM_WORLD, NULL); //tag à changer deuxième zéro ?
+    MPI_Recv(&payoff, 1, MPI_LONG, 1, 0, MPI_COMM_WORLD, NULL); //tag à changer deuxième zéro ?
     prix += payoff;
     esp_carre += pow(payoff,2);
 }
@@ -55,9 +57,12 @@ void MonteCarlo::price_master(double &prix, double &esp_carre, double &payoff){
 void MonteCarlo::price_slave(double &prix, double &ic){
     //envoyer la réponse j au maître
     double payoff;
+    PnlMat *path;
+    path = pnl_mat_create(opt_->nbTimeSteps_ + 1, mod_->size_);
     mod_->asset(path, opt_->T_, opt_->nbTimeSteps_, rng_);
     payoff = opt_->payoff(path);
     MPI_Send(&payoff, 1, MPI_LONG, 0, 0, MPI_COMM_WORLD); //tag à changer deuxième zéro ?
+    pnl_mat_free(&path);
 }
 
 

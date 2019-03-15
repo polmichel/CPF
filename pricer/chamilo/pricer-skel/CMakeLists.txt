@@ -21,16 +21,19 @@ endif ()
 
 
 # Detect MPI
-add_definitions(-DOMPI_SKIP_MPICXX)
 set(MPI_LIBS)
 find_package(MPI REQUIRED)
-if (MPI_C_FOUND)
+if (MPI_FOUND)
+    message(STATUS "MPI FOUND OOOOOOOOOOOH MA LEEELEEEEEEEEEEEEEEEEE")
     include_directories(${MPI_C_INCLUDE_PATH})
     add_definitions(-DOMPI_SKIP_MPICXX)
     set (MPI_LIBS ${MPI_LIBS} ${MPI_C_LIBRARIES})
-else (MPI_C_FOUND)
+else (MPI_FOUND)
     message(STATUS "MPI not found.")
-endif (MPI_C_FOUND)
+endif (MPI_FOUND)
+
+
+
 
 # Detect Boost
 set(Boost_NO_BOOST_CMAKE ON)
