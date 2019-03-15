@@ -41,8 +41,6 @@ void MonteCarlo_nop::price(double &prix, double &ic){
     for (size_t j = 0; j < nbSamples_; ++j) {
         mod_->asset(path, opt_->T_, opt_->nbTimeSteps_, rng_);
         payoff = opt_->payoff(path);
-        cout<< "VERIFINS LES PRIIIIIX   " << payoff<< "     "<<endl;
-
         prix += payoff;
         esp_carre += pow(payoff,2);
     }

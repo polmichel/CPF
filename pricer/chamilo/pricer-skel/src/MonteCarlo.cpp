@@ -53,6 +53,9 @@ void MonteCarlo::price_master(double &prix, double &ic, int size){
 
     }
 
+    LET(vectPrices, 0) =sumPayoff;
+    LET(vectIcs, 0) = esp_carre;
+
     for (int i = 1; i< size; i++) {
 
         // réception réponse i
@@ -67,14 +70,19 @@ void MonteCarlo::price_master(double &prix, double &ic, int size){
 
     //regroupement des différents prix pour faire la moyenne
     prix = pnl_vect_sum(vectPrices);
+
+
     prix/=nbSamples_;
+
+
     esp_carre = pnl_vect_sum(vectIcs);
     esp_carre/=nbSamples_;
 
     double estimateur_carre = exp(-2*mod_->r_*opt_->T_)*(esp_carre/nbSamples_-pow(prix/nbSamples_,2));
 
-    prix *= exp(-mod_->r_*opt_->T_)/nbSamples_;
-    ic = 1.96 * sqrt(estimateur_carre/nbSamples_);
+    prix *= exp(-mod_->r_*opt_->T_);
+
+    ic = 1.96 * sqrt(estimateur_carre);
 }
 
 void MonteCarlo::price_slave(double &prix, double &ic, int size, int rank){

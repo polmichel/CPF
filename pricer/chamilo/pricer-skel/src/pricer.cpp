@@ -20,7 +20,9 @@ int main(int argc, char **argv)
     int sized, rank;
     MPI_Comm_size (MPI_COMM_WORLD, &sized);
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
-    PnlRng *rng = pnl_rng_create(PNL_RNG_MERSENNE);
+    //créeons des rng indépendants selon le rank
+    PnlRng *rng;
+    rng = pnl_rng_dcmt_create_id(rank, time(NULL));
     pnl_rng_sseed(rng, time(NULL));
     clock_t t1, t2, t3, t4;
     t1=clock();
@@ -98,54 +100,60 @@ int main(int argc, char **argv)
 
     double end = MPI_Wtime();
     double WPITime = end-start;
-    printf("============== \nPrix: %f \nIc: %f \n", prix, ic);
-    t2 = clock();
-    float diff ((float)t2-(float)t1);
-    float seconds = diff / CLOCKS_PER_SEC;
-    printf("%f sec\n==============\n", seconds);
 
-    PnlMat *past = pnl_mat_create_from_scalar(1, size, 100);
-    PnlVect *delta = pnl_vect_create(size);
-    PnlVect *conf_delta = pnl_vect_create(size);
+    if(rank == 0) {
+        printf("============== \nPrix: %f \nIc: %f \n", prix, ic);
+        t2 = clock();
+        float diff ((float)t2-(float)t1);
+        float seconds = diff / CLOCKS_PER_SEC;
+        printf("%f sec\n==============\n", seconds);
+
+        PnlMat *past = pnl_mat_create_from_scalar(1, size, 100);
+        PnlVect *delta = pnl_vect_create(size);
+        PnlVect *conf_delta = pnl_vect_create(size);
 
 
-    mCarlo->delta(past, 0, delta, conf_delta);
-    for (int i =0; i < size; i ++){
-        printf("Delta actif %u: %f\n", i+1, pnl_vect_get(delta, i));
-        printf("Standard Deviation actif %u: %f\n", i+1, pnl_vect_get(conf_delta, i));
+        mCarlo->delta(past, 0, delta, conf_delta);
+        for (int i =0; i < size; i ++){
+            printf("Delta actif %u: %f\n", i+1, pnl_vect_get(delta, i));
+            printf("Standard Deviation actif %u: %f\n", i+1, pnl_vect_get(conf_delta, i));
+        }
+        t3 = clock();
+        float diff2 ((float)t3-(float)t1);
+        float seconds2 = diff2 / CLOCKS_PER_SEC;
+        printf("%f sec\n==============\n", seconds2);
+
+        if (optionc == 1){
+            PnlMat *market = pnl_mat_create_from_file(market_file);
+            double pnl = 0;
+            mCarlo->pnl(pnl, market, hedging_dates_number);
+            printf("P&L: %f\n", pnl);
+            t4 = clock();
+            float diff3 ((float)t4-(float)t1);
+            float seconds3 = diff3 / CLOCKS_PER_SEC;
+            printf("%f sec\n", seconds3);
+        }
+
+
+
+        cout<<"le temps écoulé fut de  : " << WPITime << "    " <<endl;
+        pnl_mat_free(&past);
+        pnl_vect_free(&delta);
+        pnl_vect_free(&conf_delta);
+
+        pnl_vect_free(&spot);
+        pnl_vect_free(&sigma);
+        pnl_vect_free(&divid);
+        pnl_rng_free(&rng);
+        delete P;
+        delete bsmodel;
+        delete opt;
+        delete mCarlo;
     }
-    t3 = clock();
-    float diff2 ((float)t3-(float)t1);
-    float seconds2 = diff2 / CLOCKS_PER_SEC;
-    printf("%f sec\n==============\n", seconds2);
 
-    if (optionc == 1){
-        PnlMat *market = pnl_mat_create_from_file(market_file);
-        double pnl = 0;
-        mCarlo->pnl(pnl, market, hedging_dates_number);
-        printf("P&L: %f\n", pnl);
-        t4 = clock();
-        float diff3 ((float)t4-(float)t1);
-        float seconds3 = diff3 / CLOCKS_PER_SEC;
-        printf("%f sec\n", seconds3);
-    }
-
-
-
-    cout<<"le temps écoulé fut de  : " << WPITime << "    " <<endl;
-    pnl_mat_free(&past);
-    pnl_vect_free(&delta);
-    pnl_vect_free(&conf_delta);
-
-    pnl_vect_free(&spot);
-    pnl_vect_free(&sigma);
-    pnl_vect_free(&divid);
-    pnl_rng_free(&rng);
-    delete P;
-    delete bsmodel;
-    delete opt;
-    delete mCarlo;
 
     MPI_Finalize ();
+
+
 
 }

@@ -16,7 +16,9 @@ using namespace std;
 int main(int argc, char **argv)
 {
     MPI_Init(&argc, &argv);
-
+    int sized, rank;
+    MPI_Comm_size (MPI_COMM_WORLD, &sized);
+    MPI_Comm_rank (MPI_COMM_WORLD, &rank);
     clock_t t1, t2, t3, t4;
     t1=clock();
     double fdStep = 0.1;
@@ -92,11 +94,14 @@ int main(int argc, char **argv)
 
     double end = MPI_Wtime();
     double WPITime = end - start;
-    printf("============== \nPrix: %f \nIc: %f \n", prix, ic);
-    t2 = clock();
-    float diff ((float)t2-(float)t1);
-    float seconds = diff / CLOCKS_PER_SEC;
-    printf("%f sec\n==============\n", seconds);
+    if(rank ==0) {
+        printf("============== \nPrix: %f \nIc: %f \n", prix, ic);
+        t2 = clock();
+        float diff ((float)t2-(float)t1);
+        float seconds = diff / CLOCKS_PER_SEC;
+        printf("%f sec\n==============\n", seconds);
+    }
+
 
     PnlMat *past = pnl_mat_create_from_scalar(1, size, 100);
     PnlVect *delta = pnl_vect_create(size);
